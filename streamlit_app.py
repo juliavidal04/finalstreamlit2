@@ -15,20 +15,17 @@ import json
 def fetch_google_sheets_data():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
-    # Load credentials from JSON file
-    with open("hola2.json") as source:
-        creds_dict = json.load(source)
-
+    # 🔹 Get credentials from Streamlit secrets (no need for hola2.json)
+    creds_dict = st.secrets["gcp_service_account"]
     creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
-    client = gspread.authorize(creds)
 
-    # Ensure the sheet name is correct
-    sheet = client.open("hola2").sheet1  
+    client = gspread.authorize(creds)
+    sheet = client.open("hola2").sheet1  # Ensure "hola2" is the correct sheet name
     data = sheet.get_all_records()
-    
+
     return pd.DataFrame(data)
 
-# Fetch data from Google Sheets
+# Load Data
 df = fetch_google_sheets_data()
 
 # Debugging: Print DataFrame to check if data is loading
@@ -93,3 +90,4 @@ if st.session_state["chart_displayed"] and st.button("Submit Response", key="sub
     end_time = time.time()
     response_time = round(end_time - st.session_state["start_time"], 2)
     st.write(f"⏳ You took **{response_time} seconds** to answer!")
+
